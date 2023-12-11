@@ -1,13 +1,14 @@
-import { TamaguiProvider, Text } from "tamagui";
+import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
-import { Slot, Stack, useRouter, useSegments } from "expo-router";
-import { ClerkProvider, SignedIn, SignedOut, useAuth } from "@clerk/clerk-expo";
+import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 
 import config from "../tamagui.config";
 import { useEffect } from "react";
-import SignUp from "./(public)/signup";
+
+SplashScreen.preventAutoHideAsync();
 
 const tokenCache = {
   async getToken(key: string) {
@@ -33,17 +34,31 @@ function InitialLayout() {
 
   useEffect(() => {
     if (!isLoaded) return;
-
     const inTabsGroup = segments[0] === "(auth)";
 
     if (isSignedIn && !inTabsGroup) {
       router.replace("/home");
-    } else if (!isSignedIn) {
+    } else if (!isSignedIn && inTabsGroup) {
       router.replace("/login");
+    } else {
+      SplashScreen.hideAsync();
+      return;
     }
   }, [isSignedIn]);
 
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen
+        name="(public)"
+        listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
+      />
+      <Stack.Screen
+        name="(auth)/home"
+        listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
+      />
+    </Stack>
+  );
 }
 
 export default function RootLayout() {
