@@ -34,6 +34,7 @@ export default function SignInScreen() {
       <View>
         <Input
           autoCapitalize="none"
+          keyboardType="email-address"
           value={emailAddress}
           placeholder="Email..."
           onChangeText={(emailAddress) => setEmailAddress(emailAddress)}

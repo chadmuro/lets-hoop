@@ -4,17 +4,12 @@ import { Button, H1 } from "tamagui";
 import { Link } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 
-export default function App() {
+export default function Map() {
   const { isLoaded, signOut } = useAuth();
 
   return (
     <View style={styles.container}>
       <H1>Let's Hoop</H1>
-      {/* <Link href="/login" asChild>
-        <Button size="$3" theme="active">
-          Login
-        </Button>
-      </Link> */}
       <Button onPress={() => signOut()}>Sign out</Button>
       <StatusBar style="auto" />
     </View>

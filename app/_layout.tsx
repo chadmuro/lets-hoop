@@ -37,7 +37,7 @@ function InitialLayout() {
     const inTabsGroup = segments[0] === "(auth)";
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace("/home");
+      router.replace("/map");
     } else if (!isSignedIn && inTabsGroup) {
       router.replace("/login");
     } else {
@@ -54,7 +54,7 @@ function InitialLayout() {
         listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
       />
       <Stack.Screen
-        name="(auth)/home"
+        name="(auth)"
         listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
       />
     </Stack>
