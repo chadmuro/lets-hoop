@@ -29,7 +29,7 @@ export default function AuthLayout() {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="profile"
         options={{
           headerTitle: "Profile",
@@ -42,10 +42,11 @@ export default function AuthLayout() {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="settings"
         options={{
+          headerShown: false,
           headerTitle: "Settings",
           tabBarLabel: "Settings",
           tabBarIcon: ({ focused }) => (
