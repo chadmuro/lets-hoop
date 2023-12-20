@@ -29,20 +29,6 @@ export default function AuthLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="profile"
-        options={{
-          headerTitle: "Profile",
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={24}
-              color={focused ? theme.orange10.get() : theme.gray10.get()}
-            />
-          ),
-        }}
-      /> */}
       <Tabs.Screen
         name="settings"
         options={{

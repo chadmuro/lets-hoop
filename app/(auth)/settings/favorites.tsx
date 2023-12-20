@@ -1,10 +1,10 @@
-import { H1 } from "tamagui";
+import { Text } from "tamagui";
 import { MyStack } from "../../../components/styled/MyStack";
 
-export default function Map() {
+export default function Favorites() {
   return (
     <MyStack>
-      <H1>Let's Hoop</H1>
+      <Text>Favorites</Text>
     </MyStack>
   );
 }

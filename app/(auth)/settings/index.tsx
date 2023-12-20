@@ -12,6 +12,7 @@ import {
   User,
   Trash,
   LogOut,
+  Star,
 } from "@tamagui/lucide-icons";
 import { useAuth } from "@clerk/clerk-expo";
 
@@ -59,6 +60,17 @@ export default function Settings() {
               pressTheme
               title="Profile"
               icon={User}
+              iconAfter={ChevronRight}
+            />
+          </Link>
+        </YGroup.Item>
+        <YGroup.Item>
+          <Link href="/settings/favorites" asChild>
+            <ListItem
+              hoverTheme
+              pressTheme
+              title="Favorites"
+              icon={Star}
               iconAfter={ChevronRight}
             />
           </Link>

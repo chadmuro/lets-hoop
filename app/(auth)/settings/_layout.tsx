@@ -23,7 +23,13 @@ export default function SettingsLayout() {
         name="profile"
         options={{
           headerTitle: "Profile",
-          presentation: "modal",
+          // presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="favorites"
+        options={{
+          headerTitle: "Favorites",
         }}
       />
     </Stack>
