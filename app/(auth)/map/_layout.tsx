@@ -31,7 +31,7 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="add"
         options={{
-          headerTitle: "New court",
+          headerTitle: "Add court",
           presentation: "modal",
         }}
       />
