@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Avatar, ListItem, Separator, YGroup, View, Button } from "tamagui";
 import { useUser } from "@clerk/clerk-expo";
 import {
@@ -7,61 +8,91 @@ import {
   Mail,
   Camera,
 } from "@tamagui/lucide-icons";
-import { MyStack } from "../../../../components/styled/MyStack";
 import { Link } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import LoadingOverlay from "../../../../components/LoadingOverlay";
+import { MyStack } from "../../../../components/styled/MyStack";
 
 export default function Profile() {
   const { user } = useUser();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const pickImage = async () => {
+    setIsUploadingImage(true);
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      base64: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage("data:image/jpeg;base64," + result.assets[0].base64);
+      if (user) {
+        const newUser = await user.setProfileImage({
+          file: "data:image/jpeg;base64," + result.assets[0].base64,
+        });
+
+        if (newUser) {
+        }
+      }
+    }
+    setIsUploadingImage(false);
+  };
 
   return (
-    <MyStack>
-      <View position="relative">
-        <Avatar circular size="$8">
-          <Avatar.Image src={user?.imageUrl} />
-          <Avatar.Fallback bc="orange" />
-        </Avatar>
-        <Button
-          position="absolute"
-          top={60}
-          left={50}
-          size="$1.5"
-          theme="orange"
-        >
-          <Camera size="$1.5" />
-        </Button>
-      </View>
-      <YGroup theme="orange" alignSelf="center" separator={<Separator />}>
-        <YGroup.Item>
-          <Link href="/settings/profile/username" asChild>
+    <>
+      {isUploadingImage && <LoadingOverlay />}
+      <MyStack>
+        <View position="relative">
+          <Avatar circular size="$10">
+            <Avatar.Image src={selectedImage ?? user?.imageUrl} />
+            <Avatar.Fallback bc="orange" />
+          </Avatar>
+          <Button
+            position="absolute"
+            top={80}
+            left={70}
+            size="$1.5"
+            theme="orange"
+            onPress={pickImage}
+          >
+            <Camera size="$1.5" />
+          </Button>
+        </View>
+        <YGroup theme="orange" alignSelf="center" separator={<Separator />}>
+          <YGroup.Item>
+            <Link href="/settings/profile/username" asChild>
+              <ListItem
+                hoverTheme
+                pressTheme
+                title="Username"
+                subTitle={user?.username}
+                icon={User}
+                iconAfter={ChevronRight}
+              />
+            </Link>
+          </YGroup.Item>
+          <YGroup.Item>
             <ListItem
-              hoverTheme
-              pressTheme
-              title="Username"
-              subTitle={user?.username}
-              icon={User}
-              iconAfter={ChevronRight}
+              title="Email"
+              subTitle={user?.primaryEmailAddress?.emailAddress}
+              icon={Mail}
             />
-          </Link>
-        </YGroup.Item>
-        <YGroup.Item>
-          <ListItem
-            title="Email"
-            subTitle={user?.primaryEmailAddress?.emailAddress}
-            icon={Mail}
-          />
-        </YGroup.Item>
-        <YGroup.Item>
-          <Link href="/settings/profile/password" asChild>
-            <ListItem
-              hoverTheme
-              pressTheme
-              title="Change password"
-              icon={KeyRound}
-              iconAfter={ChevronRight}
-            />
-          </Link>
-        </YGroup.Item>
-      </YGroup>
-    </MyStack>
+          </YGroup.Item>
+          <YGroup.Item>
+            <Link href="/settings/profile/password" asChild>
+              <ListItem
+                hoverTheme
+                pressTheme
+                title="Change password"
+                icon={KeyRound}
+                iconAfter={ChevronRight}
+              />
+            </Link>
+          </YGroup.Item>
+        </YGroup>
+      </MyStack>
+    </>
   );
 }

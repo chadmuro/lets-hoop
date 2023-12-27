@@ -28,6 +28,12 @@ module.exports = {
       favicon: "./assets/favicon.png"
     },
     plugins: [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Let's Hoop accesses your photos to upload as your avatar image."
+        }
+      ],
       "expo-router"
     ],
     extra: {
