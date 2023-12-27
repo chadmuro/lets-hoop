@@ -7,8 +7,7 @@ import { MyStack } from "../../components/styled/MyStack";
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
 
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [pendingVerification, setPendingVerification] = React.useState(false);
@@ -22,8 +21,7 @@ export default function SignUpScreen() {
 
     try {
       await signUp.create({
-        firstName,
-        lastName,
+        username,
         emailAddress,
         password,
       });
@@ -62,17 +60,9 @@ export default function SignUpScreen() {
           <View>
             <Input
               autoCapitalize="none"
-              value={firstName}
-              placeholder="First Name..."
-              onChangeText={(firstName) => setFirstName(firstName)}
-            />
-          </View>
-          <View>
-            <Input
-              autoCapitalize="none"
-              value={lastName}
-              placeholder="Last Name..."
-              onChangeText={(lastName) => setLastName(lastName)}
+              value={username}
+              placeholder="Username..."
+              onChangeText={(username) => setUsername(username)}
             />
           </View>
           <View>

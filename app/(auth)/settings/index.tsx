@@ -14,10 +14,11 @@ import {
   LogOut,
   Star,
 } from "@tamagui/lucide-icons";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 
 export default function Settings() {
   const { signOut } = useAuth();
+  const { user } = useUser();
 
   async function copyToClipboard() {
     await Clipboard.setStringAsync("chadmurodev@gmail.com");
@@ -44,7 +45,7 @@ export default function Settings() {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => console.log("delete account"),
+          onPress: async () => await user?.delete(),
         },
       ]
     );
