@@ -1,15 +1,14 @@
 import { Text, Input, Button, Label, View, YStack } from "tamagui";
 import MapView, { Marker } from "react-native-maps";
 import { MyStack } from "../../../components/styled/MyStack";
-
-const INITIAL_REGION = {
-  latitude: 35.658,
-  longitude: 139.7016,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
+import {
+  useLocation,
+  DEFAULT_LOCATION,
+} from "../../../contexts/locationContext";
 
 export default function Add() {
+  const { location } = useLocation();
+
   return (
     <YStack
       paddingHorizontal="$4"
@@ -26,10 +25,10 @@ export default function Add() {
         <Label>Select location on map</Label>
         <MapView
           style={{ width: "100%", height: 250 }}
-          initialRegion={INITIAL_REGION}
+          initialRegion={location ?? DEFAULT_LOCATION}
           userInterfaceStyle="light"
         >
-          <Marker coordinate={INITIAL_REGION} draggable />
+          <Marker coordinate={location ?? DEFAULT_LOCATION} draggable />
         </MapView>
       </View>
       {/* <View>

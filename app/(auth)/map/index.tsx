@@ -1,21 +1,29 @@
 import MapView from "react-native-maps";
 import { StyleSheet } from "react-native";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import {
+  useLocation,
+  DEFAULT_LOCATION,
+} from "../../../contexts/locationContext";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
+  const { location } = useLocation();
+
+  useEffect(() => {
+    if (location) {
+      mapRef?.current?.animateToRegion(location);
+    }
+  }, [location]);
+
   return (
     <MapView
       ref={mapRef}
       style={styles.map}
-      initialRegion={{
-        latitude: 35.658,
-        longitude: 139.7016,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      }}
+      initialRegion={location ?? DEFAULT_LOCATION}
       userInterfaceStyle="light"
       showsUserLocation
+      showsMyLocationButton
     />
   );
 }
