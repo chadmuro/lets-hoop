@@ -1,14 +1,16 @@
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useEffect, useRef } from "react";
 import {
   useLocation,
   DEFAULT_LOCATION,
 } from "../../../contexts/locationContext";
+import { useCourts } from "../../../hooks/useCourts";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
   const { location } = useLocation();
+  const { courts } = useCourts();
 
   useEffect(() => {
     if (location) {
@@ -24,7 +26,16 @@ export default function Map() {
       userInterfaceStyle="light"
       showsUserLocation
       showsMyLocationButton
-    />
+    >
+      {courts.map((court) => (
+        <Marker
+          key={court.id}
+          coordinate={{ latitude: court.latitude, longitude: court.longitude }}
+          title={court.name}
+          description={`${court.number_of_hoops} hoops`}
+        />
+      ))}
+    </MapView>
   );
 }
 
