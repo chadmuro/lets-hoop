@@ -7,11 +7,13 @@ import {
   KeyRound,
   Mail,
   Camera,
+  Trash,
 } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import LoadingOverlay from "../../../../components/LoadingOverlay";
 import { MyStack } from "../../../../components/styled/MyStack";
+import { Alert } from "react-native";
 
 export default function Profile() {
   const { user } = useUser();
@@ -39,6 +41,21 @@ export default function Profile() {
     }
     setIsUploadingImage(false);
   };
+
+  function showDeleteAccountAlert() {
+    Alert.alert(
+      "Are you sure you want to delete your account?",
+      "Once deleted your account cannot be recovered.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => await user?.delete(),
+        },
+      ]
+    );
+  }
 
   return (
     <>
@@ -90,6 +107,20 @@ export default function Profile() {
                 iconAfter={ChevronRight}
               />
             </Link>
+          </YGroup.Item>
+        </YGroup>
+        <YGroup theme="red" alignSelf="flex-end" separator={<Separator />}>
+          <YGroup.Item>
+            <ListItem
+              hoverTheme
+              pressTheme
+              title="Delete account"
+              icon={Trash}
+              iconAfter={ChevronRight}
+              color="$red10"
+              alignItems="center"
+              onPress={showDeleteAccountAlert}
+            />
           </YGroup.Item>
         </YGroup>
       </MyStack>

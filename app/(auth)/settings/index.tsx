@@ -10,15 +10,13 @@ import {
   ClipboardCopy,
   Pencil,
   User,
-  Trash,
   LogOut,
   Star,
 } from "@tamagui/lucide-icons";
-import { useAuth, useUser } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
 
 export default function Settings() {
   const { signOut } = useAuth();
-  const { user } = useUser();
 
   async function copyToClipboard() {
     await Clipboard.setStringAsync("chadmurodev@gmail.com");
@@ -34,21 +32,6 @@ export default function Settings() {
       { text: "Cancel", style: "cancel" },
       { text: "Sign out", style: "destructive", onPress: () => signOut() },
     ]);
-  }
-
-  function showDeleteAccountAlert() {
-    Alert.alert(
-      "Are you sure you want to delete your account?",
-      "Once deleted your account cannot be recovered.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => await user?.delete(),
-        },
-      ]
-    );
   }
 
   return (
@@ -121,18 +104,6 @@ export default function Settings() {
             color="$red10"
             alignItems="center"
             onPress={showSignOutAlert}
-          />
-        </YGroup.Item>
-        <YGroup.Item>
-          <ListItem
-            hoverTheme
-            pressTheme
-            title="Delete account"
-            icon={Trash}
-            iconAfter={ChevronRight}
-            color="$red10"
-            alignItems="center"
-            onPress={showDeleteAccountAlert}
           />
         </YGroup.Item>
       </YGroup>
