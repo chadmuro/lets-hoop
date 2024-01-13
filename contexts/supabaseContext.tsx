@@ -9,6 +9,7 @@ import "react-native-url-polyfill/auto";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { useAuth } from "@clerk/clerk-expo";
 import Constants from "expo-constants";
+import { Database } from "../types/supabase";
 
 type SupabaseContextType = {
   supabase: SupabaseClient<any, "public", any> | null;
@@ -33,7 +34,7 @@ const SupabaseProvider = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const supabaseClient = async (supabaseAccessToken: string | null) => {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: `Bearer ${supabaseAccessToken}` } },
       });
       // set Supabase JWT on the client object,
