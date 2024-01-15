@@ -28,9 +28,8 @@ const LocationProvider = ({ children }: PropsWithChildren<{}>) => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    console.log(location);
     if (!location) {
-      console.log("called");
+      console.log("location fetched");
       (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {

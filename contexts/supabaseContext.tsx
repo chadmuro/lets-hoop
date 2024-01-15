@@ -25,7 +25,7 @@ const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey as string;
 
 const SupabaseProvider = ({ children }: PropsWithChildren<{}>) => {
   const [supabase, setSupabase] = useState<SupabaseClient<
-    any,
+    Database,
     "public",
     any
   > | null>(null);

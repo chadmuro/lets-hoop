@@ -5,12 +5,21 @@ import {
   useLocation,
   DEFAULT_LOCATION,
 } from "../../../contexts/locationContext";
-import { useCourts } from "../../../hooks/useCourts";
+import { useCourtStore } from "../../../stores/courtStore";
+import { useSupabase } from "../../../contexts/supabaseContext";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
   const { location } = useLocation();
-  const { courts } = useCourts();
+  const { supabase } = useSupabase();
+  const fetchCourts = useCourtStore((state) => state.fetchCourts);
+  const courts = useCourtStore((state) => state.courts);
+
+  useEffect(() => {
+    if (supabase) {
+      fetchCourts(supabase);
+    }
+  }, [supabase]);
 
   useEffect(() => {
     if (location) {
