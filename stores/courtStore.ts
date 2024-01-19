@@ -4,6 +4,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 interface CourtState {
   courts: Tables<"court">[];
+  posting: boolean;
   fetchCourts: (
     supabase: SupabaseClient<any, "public", any> | null
   ) => Promise<void>;
@@ -20,6 +21,7 @@ interface CourtState {
 
 export const useCourtStore = create<CourtState>((set, get) => ({
   courts: [],
+  posting: false,
   fetchCourts: async (
     supabase: SupabaseClient<Database, "public", any> | null
   ) => {
@@ -43,6 +45,7 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     user_id: string;
     supabase: SupabaseClient<Database, "public", any> | null;
   }) => {
+    set({ posting: true });
     const res = await supabase?.from("court").insert({
       created_user_id: user_id,
       indoor_outdoor,
@@ -54,5 +57,6 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     });
 
     await get().fetchCourts(supabase);
+    set({ posting: false });
   },
 }));

@@ -7,6 +7,7 @@ import {
 } from "../../../contexts/locationContext";
 import { useCourtStore } from "../../../stores/courtStore";
 import { useSupabase } from "../../../contexts/supabaseContext";
+import { MapPin } from "@tamagui/lucide-icons";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
@@ -42,7 +43,9 @@ export default function Map() {
           coordinate={{ latitude: court.latitude, longitude: court.longitude }}
           title={court.name}
           description={`${court.number_of_hoops} hoops`}
-        />
+        >
+          <MapPin color="$red10" fill="orange" />
+        </Marker>
       ))}
     </MapView>
   );

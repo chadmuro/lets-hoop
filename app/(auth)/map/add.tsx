@@ -1,6 +1,7 @@
 import { Text, Input, Button, Label, View, RadioGroup, XStack } from "tamagui";
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import { useState } from "react";
+import { LocateFixed } from "@tamagui/lucide-icons";
 import { MyStack } from "../../../components/styled/MyStack";
 import {
   useLocation,
@@ -9,10 +10,12 @@ import {
 import { useCourtStore } from "../../../stores/courtStore";
 import { useSupabase } from "../../../contexts/supabaseContext";
 import { useUser } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 
 export default function Add() {
   const { location } = useLocation();
   const { supabase } = useSupabase();
+  const router = useRouter();
   const user = useUser();
   const startingLocation = location ?? DEFAULT_LOCATION;
 
@@ -23,7 +26,7 @@ export default function Add() {
     latitude: startingLocation.latitude,
     longitude: startingLocation.longitude,
   });
-  const courts = useCourtStore((state) => state.courts);
+  const posting = useCourtStore((state) => state.posting);
   const addCourt = useCourtStore((state) => state.addCourt);
 
   async function onCourtSave() {
@@ -36,6 +39,7 @@ export default function Add() {
       name,
       number_of_hoops: Number(numberOfHoops),
     });
+    router.back();
   }
 
   return (
@@ -90,28 +94,39 @@ export default function Add() {
       </View>
       <View>
         <Text pb="$2">Select location on map</Text>
-        <MapView
-          style={{ width: "100%", height: 300 }}
-          initialRegion={{
-            ...startingLocation,
-            latitudeDelta: 0.0122,
-            longitudeDelta: 0.0071,
-          }}
-          userInterfaceStyle="light"
+        <View
+          height={300}
+          position="relative"
+          alignItems="center"
+          justifyContent="center"
         >
-          <Marker
-            coordinate={coordinates}
-            draggable
-            onDragEnd={(e) =>
+          <MapView
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+            initialRegion={{
+              ...startingLocation,
+              latitudeDelta: 0.0122,
+              longitudeDelta: 0.0071,
+            }}
+            userInterfaceStyle="light"
+            onRegionChangeComplete={(region) => {
               setCoordinates({
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude,
-              })
-            }
+                latitude: region.latitude,
+                longitude: region.longitude,
+              });
+            }}
+          ></MapView>
+          <LocateFixed
+            color="$red10"
+            fill="orange"
+            style={{ position: "absolute" }}
           />
-        </MapView>
+        </View>
       </View>
-      <Button theme="orange" onPress={onCourtSave}>
+
+      <Button theme="orange" onPress={onCourtSave} disabled={posting}>
         Submit
       </Button>
     </MyStack>
