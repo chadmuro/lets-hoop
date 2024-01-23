@@ -16,6 +16,8 @@ module.exports = {
       "**/*"
     ],
     ios: {
+      bundleIdentifier: "com.chadmuro.letshoop",
+      buildNumber: "2",
       supportsTablet: true,
     },
     android: {
@@ -34,10 +36,21 @@ module.exports = {
           "photosPermission": "Let's Hoop accesses your photos to upload as your avatar image."
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Let's Hoop uses your location to find courts near you."
+        }
+      ],
       "expo-router"
     ],
     extra: {
-      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY
+      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+      eas: {
+        projectId: "0564a2d8-5715-44d5-a117-1052b6c164b0"
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Callout, Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useEffect, useRef } from "react";
 import {
@@ -8,6 +8,7 @@ import {
 import { useCourtStore } from "../../../stores/courtStore";
 import { useSupabase } from "../../../contexts/supabaseContext";
 import { MapPin } from "@tamagui/lucide-icons";
+import CustomCallout from "../../../components/map/CustomCallout";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
@@ -41,10 +42,14 @@ export default function Map() {
         <Marker
           key={court.id}
           coordinate={{ latitude: court.latitude, longitude: court.longitude }}
-          title={court.name}
-          description={`${court.number_of_hoops} hoops`}
         >
           <MapPin color="$red10" fill="orange" />
+          <Callout>
+            <CustomCallout
+              title={court.name}
+              number_of_hoops={court.number_of_hoops}
+            />
+          </Callout>
         </Marker>
       ))}
     </MapView>
