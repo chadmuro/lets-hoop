@@ -16,7 +16,7 @@ interface CourtState {
       user_id: string;
       supabase: SupabaseClient<any, "public", any> | null;
     }
-  ) => Promise<void>;
+  ) => Promise<{ error: string | null }>;
 }
 
 export const useCourtStore = create<CourtState>((set, get) => ({
@@ -46,7 +46,11 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     supabase: SupabaseClient<Database, "public", any> | null;
   }) => {
     set({ posting: true });
-    const res = await supabase?.from("court").insert({
+    if (!supabase) {
+      set({ posting: false });
+      return { error: "Supabase instance not available" };
+    }
+    const res = await supabase.from("court").insert({
       created_user_id: user_id,
       indoor_outdoor,
       latitude,
@@ -56,7 +60,13 @@ export const useCourtStore = create<CourtState>((set, get) => ({
       updated_at: new Date().toISOString(),
     });
 
+    if (res.error) {
+      set({ posting: false });
+      return { error: res.error.message };
+    }
+
     await get().fetchCourts(supabase);
     set({ posting: false });
+    return { error: null };
   },
 }));

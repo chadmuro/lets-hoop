@@ -11,6 +11,7 @@ import { useCourtStore } from "../../../stores/courtStore";
 import { useSupabase } from "../../../contexts/supabaseContext";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { Alert } from "react-native";
 
 export default function Add() {
   const { location } = useLocation();
@@ -30,7 +31,10 @@ export default function Add() {
   const addCourt = useCourtStore((state) => state.addCourt);
 
   async function onCourtSave() {
-    await addCourt({
+    if (!name || !numberOfHoops) {
+      return Alert.alert("Court name and number of hoops required");
+    }
+    const { error } = await addCourt({
       supabase,
       user_id: user.user?.id as string,
       indoor_outdoor: Number(indoorOutdoor),
@@ -39,6 +43,10 @@ export default function Add() {
       name,
       number_of_hoops: Number(numberOfHoops),
     });
+
+    if (error) {
+      return Alert.alert(error);
+    }
     router.back();
   }
 
