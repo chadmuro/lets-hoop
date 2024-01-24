@@ -1,6 +1,7 @@
 import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
