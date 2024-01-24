@@ -46,6 +46,7 @@ export default function Map() {
           <MapPin color="$red10" fill="orange" />
           <Callout>
             <CustomCallout
+              id={court.id}
               title={court.name}
               number_of_hoops={court.number_of_hoops}
             />

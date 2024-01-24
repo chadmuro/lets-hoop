@@ -1,13 +1,15 @@
 import { View, Text, Anchor } from "tamagui";
 import { Star } from "@tamagui/lucide-icons";
 import { TouchableOpacity } from "react-native";
+import { Link } from "expo-router";
 
 interface Props {
+  id: number;
   title: string;
   number_of_hoops: number;
 }
 
-export default function CustomCallout({ title, number_of_hoops }: Props) {
+export default function CustomCallout({ id, title, number_of_hoops }: Props) {
   return (
     <View
       width={200}
@@ -21,7 +23,7 @@ export default function CustomCallout({ title, number_of_hoops }: Props) {
         <Text>{`${number_of_hoops} hoops`}</Text>
         <Text></Text>
 
-        <Anchor>Details</Anchor>
+        <Link href={`/map/court/${id}`}>Details</Link>
       </View>
       <View>
         <TouchableOpacity>
