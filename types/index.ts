@@ -6,3 +6,5 @@ export type Supabase = SupabaseClient<Database, "public", any> | null;
 export type Court = Tables<"court">;
 
 export type Favorite = Tables<"favorite">;
+
+export type Checkin = Tables<"checkin">;

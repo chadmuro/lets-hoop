@@ -9,6 +9,35 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      checkin: {
+        Row: {
+          court_id: number | null
+          created_at: string
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          court_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          court_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkin_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "court"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       court: {
         Row: {
           created_at: string
