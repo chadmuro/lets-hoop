@@ -1,20 +1,17 @@
 import { create } from "zustand";
-import { Database, Tables } from "../types/supabase";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { Court, Supabase } from "../types";
 
 interface CourtState {
-  courts: Tables<"court">[];
+  courts: Court[];
   posting: boolean;
-  fetchCourts: (
-    supabase: SupabaseClient<any, "public", any> | null
-  ) => Promise<void>;
+  fetchCourts: (supabase: Supabase) => Promise<void>;
   addCourt: (
     props: Pick<
-      Tables<"court">,
+      Court,
       "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
     > & {
       user_id: string;
-      supabase: SupabaseClient<any, "public", any> | null;
+      supabase: Supabase;
     }
   ) => Promise<{ error: string | null }>;
 }
@@ -22,9 +19,7 @@ interface CourtState {
 export const useCourtStore = create<CourtState>((set, get) => ({
   courts: [],
   posting: false,
-  fetchCourts: async (
-    supabase: SupabaseClient<Database, "public", any> | null
-  ) => {
+  fetchCourts: async (supabase: Supabase) => {
     const res = await supabase?.from("court").select();
     if (res?.data) {
       set({ courts: res.data });
@@ -39,11 +34,11 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     name,
     number_of_hoops,
   }: Pick<
-    Tables<"court">,
+    Court,
     "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
   > & {
     user_id: string;
-    supabase: SupabaseClient<Database, "public", any> | null;
+    supabase: Supabase;
   }) => {
     set({ posting: true });
     if (!supabase) {

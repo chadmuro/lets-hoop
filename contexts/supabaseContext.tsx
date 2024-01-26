@@ -6,13 +6,14 @@ import {
   useState,
 } from "react";
 import "react-native-url-polyfill/auto";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@clerk/clerk-expo";
 import Constants from "expo-constants";
 import { Database } from "../types/supabase";
+import { Supabase } from "../types";
 
 type SupabaseContextType = {
-  supabase: SupabaseClient<any, "public", any> | null;
+  supabase: Supabase;
   loading: boolean;
 };
 
@@ -24,11 +25,7 @@ const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl as string;
 const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey as string;
 
 const SupabaseProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [supabase, setSupabase] = useState<SupabaseClient<
-    Database,
-    "public",
-    any
-  > | null>(null);
+  const [supabase, setSupabase] = useState<Supabase>(null);
   const [loading, setLoading] = useState(false);
   const { getToken } = useAuth();
 

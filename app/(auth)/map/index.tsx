@@ -9,6 +9,8 @@ import { useCourtStore } from "../../../stores/courtStore";
 import { useSupabase } from "../../../contexts/supabaseContext";
 import { MapPin } from "@tamagui/lucide-icons";
 import CustomCallout from "../../../components/map/CustomCallout";
+import { useFavoriteStore } from "../../../stores/favoriteStore";
+import { useUser } from "@clerk/clerk-expo";
 
 export default function Map() {
   const mapRef = useRef<MapView | null>(null);
@@ -16,10 +18,15 @@ export default function Map() {
   const { supabase } = useSupabase();
   const fetchCourts = useCourtStore((state) => state.fetchCourts);
   const courts = useCourtStore((state) => state.courts);
+  const fetchFavorites = useFavoriteStore((state) => state.fetchFavorites);
+  const user = useUser();
 
   useEffect(() => {
     if (supabase) {
       fetchCourts(supabase);
+      if (user.user?.id) {
+        fetchFavorites({ user_id: user.user.id, supabase });
+      }
     }
   }, [supabase]);
 
