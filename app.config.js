@@ -17,7 +17,7 @@ module.exports = {
     ],
     ios: {
       bundleIdentifier: "com.chadmuro.letshoop",
-      buildNumber: "2",
+      buildNumber: "3",
       supportsTablet: true,
     },
     android: {
