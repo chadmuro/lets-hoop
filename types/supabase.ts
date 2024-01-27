@@ -11,22 +11,28 @@ export interface Database {
     Tables: {
       checkin: {
         Row: {
-          court_id: number | null
+          avatar: string | null
+          court_id: number
           created_at: string
           id: number
-          user_id: string | null
+          user_id: string
+          username: string | null
         }
         Insert: {
-          court_id?: number | null
+          avatar?: string | null
+          court_id: number
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
+          username?: string | null
         }
         Update: {
-          court_id?: number | null
+          avatar?: string | null
+          court_id?: number
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
+          username?: string | null
         }
         Relationships: [
           {
@@ -52,7 +58,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          created_user_id: string
+          created_user_id?: string
           id?: number
           indoor_outdoor: number
           latitude: number
@@ -76,22 +82,22 @@ export interface Database {
       }
       favorite: {
         Row: {
-          court_id: number | null
+          court_id: number
           created_at: string
           id: number
-          user_id: string | null
+          user_id: string
         }
         Insert: {
-          court_id?: number | null
+          court_id: number
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
         }
         Update: {
-          court_id?: number | null
+          court_id?: number
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {

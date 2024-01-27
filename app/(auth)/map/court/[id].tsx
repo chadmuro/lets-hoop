@@ -4,12 +4,14 @@ import {
   H3,
   H5,
   ScrollView,
+  Spinner,
   Text,
   XStack,
   YStack,
   useTheme,
 } from "tamagui";
 import { Image } from "expo-image";
+import dayjs from "dayjs";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../../../stores/courtStore";
@@ -18,34 +20,8 @@ import { Star } from "@tamagui/lucide-icons";
 import { useFavoriteStore } from "../../../../stores/favoriteStore";
 import { useSupabase } from "../../../../contexts/supabaseContext";
 import { useUser } from "@clerk/clerk-expo";
-import { useCheckinStore } from "../../../../stores/checkinStore";
-
-const recentCheckinData = [
-  {
-    id: 1,
-    username: "chadmuro",
-    avatar: "http://placekitten.com/200/300",
-    date: "2024-01-20",
-  },
-  {
-    id: 2,
-    username: "chadmuro",
-    avatar: "http://placekitten.com/200/300",
-    date: "2024-01-20",
-  },
-  {
-    id: 3,
-    username: "chadmuro",
-    avatar: "http://placekitten.com/200/300",
-    date: "2024-01-20",
-  },
-  {
-    id: 4,
-    username: "chadmuro",
-    avatar: "http://placekitten.com/200/300",
-    date: "2024-01-20",
-  },
-];
+import { useCourtDetailStore } from "../../../../stores/courtDetailStore";
+import { useEffect } from "react";
 
 export default function Court() {
   const { id } = useGlobalSearchParams();
@@ -58,7 +34,20 @@ export default function Court() {
   const updating = useFavoriteStore((state) => state.updating);
   const addFavorite = useFavoriteStore((state) => state.addFavorite);
   const deleteFavorite = useFavoriteStore((state) => state.deleteFavorite);
-  const addCheckin = useCheckinStore((state) => state.addCheckin);
+  const addCheckin = useCourtDetailStore((state) => state.addCheckin);
+  const updatingCheckin = useCourtDetailStore((state) => state.updating);
+  const fetchCourtDetails = useCourtDetailStore(
+    (state) => state.fetchCourtDetails
+  );
+  const loading = useCourtDetailStore((state) => state.loading);
+  const courtDetail = useCourtDetailStore((state) => state.courtDetail);
+
+  useEffect(() => {
+    fetchCourtDetails({
+      id: Number(id),
+      supabase,
+    });
+  }, []);
 
   const selectedFavorite = favorites.find(
     (favorite) => favorite.court_id === Number(id)
@@ -90,10 +79,11 @@ export default function Court() {
       {
         text: "Checkin",
         onPress: () => {
-          if (!user.user?.id) return;
+          if (!user.user) return;
           addCheckin({
             court_id: Number(id),
-            user_id: user.user?.id,
+            username: user.user.username,
+            avatar: user.user.imageUrl,
             supabase,
           });
         },
@@ -123,25 +113,37 @@ export default function Court() {
           <Text>Number of hoops: {courtData?.number_of_hoops}</Text>
           <Text>{courtData?.indoor_outdoor === 0 ? "Indoor" : "Outdoor"}</Text>
           <Button theme="orange">Add Image</Button>
-          <Button theme="orange" onPress={onCheckinPress}>
+          <Button
+            theme="orange"
+            onPress={onCheckinPress}
+            disabled={updatingCheckin}
+          >
             Check in
           </Button>
           <YStack space="$3">
             <H5>Recent check-ins</H5>
-            {recentCheckinData.map((checkin) => {
-              return (
-                <XStack key={checkin.id} jc="space-between" ai="center">
-                  <XStack ai="center">
-                    <Avatar circular size="$3">
-                      <Avatar.Image src={checkin.avatar} />
-                      <Avatar.Fallback bc="orange" />
-                    </Avatar>
-                    <Text pl="$2">{checkin.username}</Text>
+            {loading ? (
+              <Spinner size="large" color="$orange10" />
+            ) : courtDetail && courtDetail?.checkins.length > 0 ? (
+              courtDetail?.checkins.map((checkin) => {
+                return (
+                  <XStack key={checkin.id} jc="space-between" ai="center">
+                    <XStack ai="center">
+                      <Avatar circular size="$3">
+                        <Avatar.Image src={checkin.avatar ?? "https://test"} />
+                        <Avatar.Fallback bc="orange" />
+                      </Avatar>
+                      <Text pl="$2">{checkin.username}</Text>
+                    </XStack>
+                    <Text>
+                      {dayjs(checkin.created_at).format("YYYY-MM-DD HH:mm")}
+                    </Text>
                   </XStack>
-                  <Text>{checkin.date}</Text>
-                </XStack>
-              );
-            })}
+                );
+              })
+            ) : (
+              <Text>No Checkins</Text>
+            )}
           </YStack>
           <Link href="/map" asChild>
             <Button>Back to map</Button>

@@ -59,7 +59,6 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
     }
     const res = await supabase.from("favorite").insert({
       court_id,
-      user_id,
     });
 
     if (res.error) {

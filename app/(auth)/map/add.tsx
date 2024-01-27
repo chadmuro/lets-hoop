@@ -36,7 +36,6 @@ export default function Add() {
     }
     const { error } = await addCourt({
       supabase,
-      user_id: user.user?.id as string,
       indoor_outdoor: Number(indoorOutdoor),
       latitude: coordinates.latitude,
       longitude: coordinates.longitude,

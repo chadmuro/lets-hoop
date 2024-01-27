@@ -10,7 +10,6 @@ interface CourtState {
       Court,
       "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
     > & {
-      user_id: string;
       supabase: Supabase;
     }
   ) => Promise<{ error: string | null }>;
@@ -27,7 +26,6 @@ export const useCourtStore = create<CourtState>((set, get) => ({
   },
   addCourt: async ({
     supabase,
-    user_id,
     indoor_outdoor,
     latitude,
     longitude,
@@ -37,7 +35,6 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     Court,
     "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
   > & {
-    user_id: string;
     supabase: Supabase;
   }) => {
     set({ posting: true });
@@ -46,7 +43,6 @@ export const useCourtStore = create<CourtState>((set, get) => ({
       return { error: "Supabase instance not available" };
     }
     const res = await supabase.from("court").insert({
-      created_user_id: user_id,
       indoor_outdoor,
       latitude,
       longitude,
