@@ -54,10 +54,7 @@ function InitialLayout() {
         name="(public)"
         listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
       />
-      <Stack.Screen
-        name="(auth)"
-        listeners={{ transitionEnd: () => SplashScreen.hideAsync() }}
-      />
+      <Stack.Screen name="(auth)" />
     </Stack>
   );
 }
