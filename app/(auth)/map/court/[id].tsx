@@ -12,6 +12,7 @@ import {
 } from "tamagui";
 import { Image } from "expo-image";
 import dayjs from "dayjs";
+import * as ImagePicker from "expo-image-picker";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../../../stores/courtStore";
@@ -71,13 +72,13 @@ export default function Court() {
   }
 
   function onCheckinPress() {
-    Alert.alert("Are you sure you want to checkin here?", "", [
+    Alert.alert("Are you sure you want to check-in here?", "", [
       {
         text: "Cancel",
         style: "cancel",
       },
       {
-        text: "Checkin",
+        text: "Check-in",
         onPress: () => {
           if (!user.user) return;
           addCheckin({
@@ -90,6 +91,19 @@ export default function Court() {
       },
     ]);
   }
+
+  const pickImage = async () => {
+    // setIsUploadingImage(true);
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      base64: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+    }
+    // setIsUploadingImage(false);
+  };
 
   return (
     <MyStack padding="$0">
@@ -112,13 +126,15 @@ export default function Court() {
           </XStack>
           <Text>Number of hoops: {courtData?.number_of_hoops}</Text>
           <Text>{courtData?.indoor_outdoor === 0 ? "Indoor" : "Outdoor"}</Text>
-          <Button theme="orange">Add Image</Button>
+          <Button theme="orange" onPress={pickImage}>
+            Add Image
+          </Button>
           <Button
             theme="orange"
             onPress={onCheckinPress}
             disabled={updatingCheckin}
           >
-            Check in
+            Check-in
           </Button>
           <YStack space="$3">
             <H5>Recent check-ins</H5>
@@ -142,7 +158,7 @@ export default function Court() {
                 );
               })
             ) : (
-              <Text>No Checkins</Text>
+              <Text>No Check-ins</Text>
             )}
           </YStack>
           <Link href="/map" asChild>

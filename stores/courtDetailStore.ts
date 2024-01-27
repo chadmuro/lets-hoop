@@ -33,7 +33,6 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
       .select()
       .eq("court_id", id)
       .order("created_at", { ascending: false });
-    console.log(checkinRes);
     if (checkinRes?.data) {
       set({
         courtDetail: {
@@ -73,7 +72,6 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
       .select()
       .eq("court_id", court_id)
       .order("created_at", { ascending: false });
-    console.log(checkinRes);
     if (checkinRes?.data) {
       set({
         courtDetail: {
