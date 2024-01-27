@@ -13,11 +13,12 @@ import { Image } from "expo-image";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../../../stores/courtStore";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import { Star } from "@tamagui/lucide-icons";
 import { useFavoriteStore } from "../../../../stores/favoriteStore";
 import { useSupabase } from "../../../../contexts/supabaseContext";
 import { useUser } from "@clerk/clerk-expo";
+import { useCheckinStore } from "../../../../stores/checkinStore";
 
 const recentCheckinData = [
   {
@@ -57,6 +58,7 @@ export default function Court() {
   const updating = useFavoriteStore((state) => state.updating);
   const addFavorite = useFavoriteStore((state) => state.addFavorite);
   const deleteFavorite = useFavoriteStore((state) => state.deleteFavorite);
+  const addCheckin = useCheckinStore((state) => state.addCheckin);
 
   const selectedFavorite = favorites.find(
     (favorite) => favorite.court_id === Number(id)
@@ -77,6 +79,26 @@ export default function Court() {
         supabase,
       });
     }
+  }
+
+  function onCheckinPress() {
+    Alert.alert("Are you sure you want to checkin here?", "", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Checkin",
+        onPress: () => {
+          if (!user.user?.id) return;
+          addCheckin({
+            court_id: Number(id),
+            user_id: user.user?.id,
+            supabase,
+          });
+        },
+      },
+    ]);
   }
 
   return (
@@ -101,7 +123,9 @@ export default function Court() {
           <Text>Number of hoops: {courtData?.number_of_hoops}</Text>
           <Text>{courtData?.indoor_outdoor === 0 ? "Indoor" : "Outdoor"}</Text>
           <Button theme="orange">Add Image</Button>
-          <Button theme="orange">Check in</Button>
+          <Button theme="orange" onPress={onCheckinPress}>
+            Check in
+          </Button>
           <YStack space="$3">
             <H5>Recent check-ins</H5>
             {recentCheckinData.map((checkin) => {
