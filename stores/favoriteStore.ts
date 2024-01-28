@@ -32,9 +32,19 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
   }) => {
     const res = await supabase
       ?.from("favorite")
-      .select()
+      .select(
+        `
+          id,
+          court_id,
+          user_id,
+          created_at,
+          court (name)
+        `
+      )
       .eq("user_id", user_id);
+
     if (res?.data) {
+      //@ts-expect-error
       set({ favorites: res.data });
     }
   },
@@ -50,7 +60,15 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
     set((state) => ({
       favorites: [
         ...state.favorites,
-        { id: 99999, court_id, user_id, created_at: "9999-01-01" },
+        {
+          id: 99999,
+          court_id,
+          user_id,
+          created_at: "9999-01-01",
+          court: {
+            name: "",
+          },
+        },
       ],
     }));
     if (!supabase) {
