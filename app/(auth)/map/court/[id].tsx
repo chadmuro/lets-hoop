@@ -1,17 +1,15 @@
 import {
-  Avatar,
   Button,
   H3,
-  H5,
   ScrollView,
   Spinner,
   Text,
+  View,
   XStack,
   YStack,
   useTheme,
 } from "tamagui";
 import { Image } from "expo-image";
-import dayjs from "dayjs";
 import * as ImagePicker from "expo-image-picker";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
@@ -23,6 +21,7 @@ import { useSupabase } from "../../../../contexts/supabaseContext";
 import { useUser } from "@clerk/clerk-expo";
 import { useCourtDetailStore } from "../../../../stores/courtDetailStore";
 import { useEffect } from "react";
+import CheckinList from "../../../../components/court/CheckinList";
 
 export default function Court() {
   const { id } = useGlobalSearchParams();
@@ -40,7 +39,8 @@ export default function Court() {
   const fetchCourtDetails = useCourtDetailStore(
     (state) => state.fetchCourtDetails
   );
-  const loading = useCourtDetailStore((state) => state.loading);
+  const loadingImages = useCourtDetailStore((state) => state.loadingImages);
+  const loadingCheckins = useCourtDetailStore((state) => state.loadingCheckins);
   const courtDetail = useCourtDetailStore((state) => state.courtDetail);
 
   useEffect(() => {
@@ -105,13 +105,34 @@ export default function Court() {
     // setIsUploadingImage(false);
   };
 
-  return (
-    <MyStack padding="$0">
+  let imageMain: React.ReactNode = null;
+  if (loadingImages) {
+    imageMain = (
+      <View style={{ width: "100%", height: "45%" }}>
+        <Spinner
+          size="large"
+          color="$orange10"
+          style={{ width: "100%", height: "45%", marginTop: "auto" }}
+        />
+      </View>
+    );
+  } else {
+    imageMain = (
       <Image
-        source="https://images.unsplash.com/photo-1615174438196-b3538fe68737?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        source={
+          courtDetail?.images[0]
+            ? courtDetail?.images[0]
+            : "https://images.unsplash.com/photo-1615174438196-b3538fe68737?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        }
         contentFit="cover"
         style={{ width: "100%", height: "45%" }}
       />
+    );
+  }
+
+  return (
+    <MyStack padding="$0">
+      {imageMain}
       <ScrollView>
         <YStack px="$4" pb="$6" space>
           <XStack ai="center" jc="space-between">
@@ -136,31 +157,7 @@ export default function Court() {
           >
             Check-in
           </Button>
-          <YStack space="$3">
-            <H5>Recent check-ins</H5>
-            {loading ? (
-              <Spinner size="large" color="$orange10" />
-            ) : courtDetail && courtDetail?.checkins.length > 0 ? (
-              courtDetail?.checkins.map((checkin) => {
-                return (
-                  <XStack key={checkin.id} jc="space-between" ai="center">
-                    <XStack ai="center">
-                      <Avatar circular size="$3">
-                        <Avatar.Image src={checkin.avatar ?? "https://test"} />
-                        <Avatar.Fallback bc="orange" />
-                      </Avatar>
-                      <Text pl="$2">{checkin.username}</Text>
-                    </XStack>
-                    <Text>
-                      {dayjs(checkin.created_at).format("YYYY-MM-DD HH:mm")}
-                    </Text>
-                  </XStack>
-                );
-              })
-            ) : (
-              <Text>No Check-ins</Text>
-            )}
-          </YStack>
+          <CheckinList loading={loadingCheckins} courtDetail={courtDetail} />
           <Link href="/map" asChild>
             <Button>Back to map</Button>
           </Link>
