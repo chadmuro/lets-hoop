@@ -17,15 +17,13 @@ import { useCourtStore } from "../../../../stores/courtStore";
 import { Alert, TouchableOpacity } from "react-native";
 import { Star } from "@tamagui/lucide-icons";
 import { useFavoriteStore } from "../../../../stores/favoriteStore";
-import { useSupabase } from "../../../../contexts/supabaseContext";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useCourtDetailStore } from "../../../../stores/courtDetailStore";
 import { useEffect } from "react";
 import CheckinList from "../../../../components/court/CheckinList";
 
 export default function Court() {
   const { id } = useGlobalSearchParams();
-  const { supabase } = useSupabase();
   const courts = useCourtStore((state) => state.courts);
   const courtData = courts.find((court) => court.id === Number(id));
   const theme = useTheme();
@@ -42,31 +40,42 @@ export default function Court() {
   const loadingImages = useCourtDetailStore((state) => state.loadingImages);
   const loadingCheckins = useCourtDetailStore((state) => state.loadingCheckins);
   const courtDetail = useCourtDetailStore((state) => state.courtDetail);
+  const { getToken } = useAuth();
 
   useEffect(() => {
-    fetchCourtDetails({
-      id: Number(id),
-      supabase,
-    });
+    async function initialLoad() {
+      const token = await getToken({ template: "supabase" });
+      if (!token) return;
+
+      fetchCourtDetails({
+        id: Number(id),
+        token,
+      });
+    }
+
+    initialLoad();
   }, []);
 
   const selectedFavorite = favorites.find(
     (favorite) => favorite.court_id === Number(id)
   );
 
-  function toggleFavorite() {
+  async function toggleFavorite() {
+    const token = await getToken({ template: "supabase" });
+    if (!token) return;
+
     if (selectedFavorite) {
       deleteFavorite({
         id: selectedFavorite.id,
         user_id: selectedFavorite.user_id,
-        supabase,
+        token,
       });
     } else {
       if (!user.user?.id) return;
       addFavorite({
         court_id: Number(id),
         user_id: user.user?.id,
-        supabase,
+        token,
       });
     }
   }
@@ -79,13 +88,15 @@ export default function Court() {
       },
       {
         text: "Check-in",
-        onPress: () => {
+        onPress: async () => {
+          const token = await getToken({ template: "supabase" });
           if (!user.user) return;
+          if (!token) return;
           addCheckin({
             court_id: Number(id),
             username: user.user.username,
             avatar: user.user.imageUrl,
-            supabase,
+            token,
           });
         },
       },

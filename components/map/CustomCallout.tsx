@@ -1,10 +1,9 @@
-import { View, Text, Anchor, useTheme } from "tamagui";
+import { View, Text, useTheme } from "tamagui";
 import { Star } from "@tamagui/lucide-icons";
 import { TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import { useFavoriteStore } from "../../stores/favoriteStore";
-import { useSupabase } from "../../contexts/supabaseContext";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 
 interface Props {
   id: number;
@@ -14,30 +13,33 @@ interface Props {
 
 export default function CustomCallout({ id, title, number_of_hoops }: Props) {
   const theme = useTheme();
-  const { supabase } = useSupabase();
   const user = useUser();
   const favorites = useFavoriteStore((state) => state.favorites);
   const updating = useFavoriteStore((state) => state.updating);
   const addFavorite = useFavoriteStore((state) => state.addFavorite);
   const deleteFavorite = useFavoriteStore((state) => state.deleteFavorite);
+  const { getToken } = useAuth();
 
   const selectedFavorite = favorites.find(
     (favorite) => favorite.court_id === id
   );
 
-  function toggleFavorite() {
+  async function toggleFavorite() {
+    const token = await getToken({ template: "supabase" });
+    if (!token) return;
+
     if (selectedFavorite) {
       deleteFavorite({
         id: selectedFavorite.id,
         user_id: selectedFavorite.user_id,
-        supabase,
+        token,
       });
     } else {
       if (!user.user?.id) return;
       addFavorite({
         court_id: Number(id),
         user_id: user.user?.id,
-        supabase,
+        token,
       });
     }
   }

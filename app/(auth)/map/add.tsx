@@ -8,16 +8,14 @@ import {
   DEFAULT_LOCATION,
 } from "../../../contexts/locationContext";
 import { useCourtStore } from "../../../stores/courtStore";
-import { useSupabase } from "../../../contexts/supabaseContext";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 
 export default function Add() {
   const { location } = useLocation();
-  const { supabase } = useSupabase();
+  const { getToken } = useAuth();
   const router = useRouter();
-  const user = useUser();
   const startingLocation = location ?? DEFAULT_LOCATION;
 
   const [name, setName] = useState("");
@@ -34,8 +32,12 @@ export default function Add() {
     if (!name || !numberOfHoops) {
       return Alert.alert("Court name and number of hoops required");
     }
+    const token = await getToken({ template: "supabase" });
+    if (!token) {
+      return Alert.alert("An error occured", "Please try again");
+    }
     const { error } = await addCourt({
-      supabase,
+      token,
       indoor_outdoor: Number(indoorOutdoor),
       latitude: coordinates.latitude,
       longitude: coordinates.longitude,

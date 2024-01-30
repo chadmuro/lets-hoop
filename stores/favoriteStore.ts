@@ -1,22 +1,23 @@
 import { create } from "zustand";
-import { Favorite, Supabase } from "../types";
+import { Favorite } from "../types";
+import { supabaseClient } from "../supabase";
 
 interface FavoriteState {
   updating: boolean;
   favorites: Favorite[];
   fetchFavorites: (
     props: Pick<Favorite, "user_id"> & {
-      supabase: Supabase;
+      token: string;
     }
   ) => Promise<void>;
   addFavorite: (
     props: Pick<Favorite, "court_id" | "user_id"> & {
-      supabase: Supabase;
+      token: string;
     }
   ) => Promise<{ error: string | null }>;
   deleteFavorite: (
     props: Pick<Favorite, "id" | "user_id"> & {
-      supabase: Supabase;
+      token: string;
     }
   ) => Promise<{ error: string | null }>;
 }
@@ -26,10 +27,11 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
   favorites: [],
   fetchFavorites: async ({
     user_id,
-    supabase,
+    token,
   }: Pick<Favorite, "user_id"> & {
-    supabase: Supabase;
+    token: string;
   }) => {
+    const supabase = await supabaseClient(token);
     const res = await supabase
       ?.from("favorite")
       .select(
@@ -51,9 +53,9 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
   addFavorite: async ({
     court_id,
     user_id,
-    supabase,
+    token,
   }: Pick<Favorite, "court_id" | "user_id"> & {
-    supabase: Supabase;
+    token: string;
   }) => {
     set({ updating: true });
     // create favorite to update UI instantly
@@ -71,10 +73,7 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
         },
       ],
     }));
-    if (!supabase) {
-      set({ updating: false });
-      return { error: "Supabase instance not available" };
-    }
+    const supabase = await supabaseClient(token);
     const res = await supabase.from("favorite").insert({
       court_id,
     });
@@ -84,16 +83,16 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
       return { error: res.error.message };
     }
 
-    await get().fetchFavorites({ user_id, supabase });
+    await get().fetchFavorites({ user_id, token });
     set({ updating: false });
     return { error: null };
   },
   deleteFavorite: async ({
     id,
     user_id,
-    supabase,
+    token,
   }: Pick<Favorite, "id" | "user_id"> & {
-    supabase: Supabase;
+    token: string;
   }) => {
     set({ updating: true });
     // delete favorite to update UI instantly
@@ -102,10 +101,7 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
       return { favorites: newState };
     });
 
-    if (!supabase) {
-      set({ updating: false });
-      return { error: "Supabase instance not available" };
-    }
+    const supabase = await supabaseClient(token);
     const res = await supabase.from("favorite").delete().eq("id", id);
 
     if (res.error) {
@@ -113,7 +109,7 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
       return { error: res.error.message };
     }
 
-    await get().fetchFavorites({ user_id, supabase });
+    await get().fetchFavorites({ user_id, token });
     set({ updating: false });
     return { error: null };
   },

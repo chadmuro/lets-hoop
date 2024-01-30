@@ -1,16 +1,17 @@
 import { create } from "zustand";
-import { Court, Supabase } from "../types";
+import { Court } from "../types";
+import { supabaseClient } from "../supabase";
 
 interface CourtState {
   courts: Court[];
   posting: boolean;
-  fetchCourts: (supabase: Supabase) => Promise<void>;
+  fetchCourts: (token: string) => Promise<void>;
   addCourt: (
     props: Pick<
       Court,
       "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
     > & {
-      supabase: Supabase;
+      token: string;
     }
   ) => Promise<{ error: string | null }>;
 }
@@ -18,14 +19,15 @@ interface CourtState {
 export const useCourtStore = create<CourtState>((set, get) => ({
   courts: [],
   posting: false,
-  fetchCourts: async (supabase: Supabase) => {
+  fetchCourts: async (token: string) => {
+    const supabase = await supabaseClient(token);
     const res = await supabase?.from("court").select();
     if (res?.data) {
       set({ courts: res.data });
     }
   },
   addCourt: async ({
-    supabase,
+    token,
     indoor_outdoor,
     latitude,
     longitude,
@@ -35,13 +37,10 @@ export const useCourtStore = create<CourtState>((set, get) => ({
     Court,
     "indoor_outdoor" | "latitude" | "longitude" | "name" | "number_of_hoops"
   > & {
-    supabase: Supabase;
+    token: string;
   }) => {
     set({ posting: true });
-    if (!supabase) {
-      set({ posting: false });
-      return { error: "Supabase instance not available" };
-    }
+    const supabase = await supabaseClient(token);
     const res = await supabase.from("court").insert({
       indoor_outdoor,
       latitude,
@@ -56,7 +55,7 @@ export const useCourtStore = create<CourtState>((set, get) => ({
       return { error: res.error.message };
     }
 
-    await get().fetchCourts(supabase);
+    await get().fetchCourts(token);
     set({ posting: false });
     return { error: null };
   },

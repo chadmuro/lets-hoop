@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { Checkin, Court, Supabase } from "../types";
+import { Checkin, Court } from "../types";
+import { supabaseClient } from "../supabase";
 
 interface CourtDetailState {
   courtDetail: {
@@ -12,12 +13,12 @@ interface CourtDetailState {
   loadingImages: boolean;
   loadingCheckins: boolean;
   fetchCourtDetails: (
-    props: Pick<Court, "id"> & { supabase: Supabase }
+    props: Pick<Court, "id"> & { token: string }
   ) => Promise<void>;
   updating: boolean;
   addCheckin: (
     props: Pick<Checkin, "court_id" | "username" | "avatar"> & {
-      supabase: Supabase;
+      token: string;
     }
   ) => Promise<{ error: string | null }>;
 }
@@ -28,10 +29,11 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
   loadingCheckins: false,
   fetchCourtDetails: async ({
     id,
-    supabase,
-  }: Pick<Court, "id"> & { supabase: Supabase }) => {
+    token,
+  }: Pick<Court, "id"> & { token: string }) => {
     set({ loadingImages: true });
     set({ loadingCheckins: true });
+    const supabase = await supabaseClient(token);
     const checkinRes = await supabase
       ?.from("checkin")
       .select()
@@ -91,15 +93,12 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
     court_id,
     username,
     avatar,
-    supabase,
+    token,
   }: Pick<Checkin, "court_id" | "username" | "avatar"> & {
-    supabase: Supabase;
+    token: string;
   }) => {
     set({ updating: true });
-    if (!supabase) {
-      set({ updating: false });
-      return { error: "Supabase instance not available" };
-    }
+    const supabase = await supabaseClient(token);
     const res = await supabase.from("checkin").insert({
       court_id,
       username,
