@@ -15,8 +15,8 @@ import * as FileSystem from "expo-file-system";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../../../stores/courtStore";
-import { Alert, TouchableOpacity } from "react-native";
-import { Star } from "@tamagui/lucide-icons";
+import { Alert, Dimensions, TouchableOpacity } from "react-native";
+import { Star, X } from "@tamagui/lucide-icons";
 import { useFavoriteStore } from "../../../../stores/favoriteStore";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useCourtDetailStore } from "../../../../stores/courtDetailStore";
@@ -41,6 +41,9 @@ export default function Court() {
   const loadingImages = useCourtDetailStore((state) => state.loadingImages);
   const loadingCheckins = useCourtDetailStore((state) => state.loadingCheckins);
   const courtDetail = useCourtDetailStore((state) => state.courtDetail);
+  const resetCourtDetail = useCourtDetailStore(
+    (state) => state.resetCourtDetail
+  );
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -59,6 +62,8 @@ export default function Court() {
     }
 
     initialLoad();
+
+    return () => resetCourtDetail();
   }, []);
 
   const selectedFavorite = favorites.find(
@@ -117,11 +122,13 @@ export default function Court() {
 
     if (!result.canceled) {
       const img = result.assets[0];
+      if (img.fileSize! > 10485760) {
+        return Alert.alert("Image size is too large");
+      }
       const base64 = await FileSystem.readAsStringAsync(img.uri, {
         encoding: "base64",
       });
       const filePath = `${courtData?.id}/${new Date().getTime()}.png`;
-      console.log(filePath);
       const token = await getToken({ template: "supabase" });
       if (!token || typeof courtData?.id !== "number") return;
       await uploadImage({ id: courtData?.id, base64, filePath, token });
@@ -139,17 +146,81 @@ export default function Court() {
         />
       </View>
     );
+  } else if (!loadingImages && courtDetail?.images.length === 0) {
+    imageMain = (
+      <>
+        <Image
+          source="https://images.unsplash.com/photo-1615174438196-b3538fe68737?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          contentFit="cover"
+          style={{ width: "100%", height: "45%" }}
+        />
+        <Link href="/map" asChild>
+          <Button
+            position="absolute"
+            top={10}
+            right={10}
+            size="$2"
+            theme="orange"
+          >
+            <X size="$1" />
+          </Button>
+        </Link>
+      </>
+    );
+  } else if (!loadingImages && courtDetail?.images.length === 1) {
+    imageMain = (
+      <>
+        <Image
+          source={courtDetail.images[0]}
+          contentFit="cover"
+          style={{ width: "100%", height: "45%" }}
+        />
+        <Link href="/map" asChild>
+          <Button
+            position="absolute"
+            top={10}
+            right={10}
+            size="$2"
+            theme="orange"
+          >
+            <X size="$1" />
+          </Button>
+        </Link>
+      </>
+    );
   } else {
     imageMain = (
-      <Image
-        source={
-          courtDetail?.images[0]
-            ? courtDetail?.images[0]
-            : "https://images.unsplash.com/photo-1615174438196-b3538fe68737?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        }
-        contentFit="cover"
-        style={{ width: "100%", height: "45%" }}
-      />
+      <View style={{ width: "100%", height: "45%" }}>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          style={{ width: "100%", height: "45%" }}
+        >
+          {courtDetail?.images.map((image, index) => (
+            <Image
+              key={index}
+              source={
+                image
+                  ? image
+                  : "https://images.unsplash.com/photo-1615174438196-b3538fe68737?q=80&w=3165&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              }
+              contentFit="cover"
+              style={{ width: Dimensions.get("window").width, height: "100%" }}
+            />
+          ))}
+        </ScrollView>
+        <Link href="/map" asChild>
+          <Button
+            position="absolute"
+            top={10}
+            right={10}
+            size="$2"
+            theme="orange"
+          >
+            <X size="$1" />
+          </Button>
+        </Link>
+      </View>
     );
   }
 

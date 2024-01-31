@@ -70,7 +70,7 @@ export default function Profile() {
             position="absolute"
             top={80}
             left={70}
-            size="$1.5"
+            size="$2"
             theme="orange"
             onPress={pickImage}
           >

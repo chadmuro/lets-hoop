@@ -30,6 +30,7 @@ interface CourtDetailState {
       token: string;
     }
   ) => Promise<void>;
+  resetCourtDetail: () => void;
 }
 
 export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
@@ -66,11 +67,17 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
   },
   fetchImages: async ({ id, token }: Pick<Court, "id"> & { token: string }) => {
     set({ loadingImages: true });
+    set((state) => ({
+      courtDetail: {
+        checkins: state.courtDetail ? [...state.courtDetail.checkins] : [],
+        images: [],
+      },
+    }));
     const supabase = await supabaseClient(token);
     const imageListRes = await supabase?.storage
       .from("courts")
       .list(String(id), {
-        limit: 1,
+        limit: 3,
         offset: 0,
         sortBy: { column: "created_at", order: "desc" },
       });
@@ -89,7 +96,9 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
                 checkins: state.courtDetail
                   ? [...state.courtDetail.checkins]
                   : [],
-                images: [fr.result as string],
+                images: state.courtDetail
+                  ? [...state.courtDetail.images, fr.result as string]
+                  : [fr.result as string],
               },
             }));
           };
@@ -134,13 +143,20 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
     return { error: null };
   },
   uploadImage: async ({ id, base64, filePath, token }) => {
+    set({ loadingImages: true });
     const supabase = await supabaseClient(token);
 
     const res = await supabase.storage
       .from("courts")
-      .upload(filePath, decode(base64), { contentType: "img/png" });
+      .upload(filePath, decode(base64), { contentType: "image/png" });
+    console.log(res);
     if (!res.error) {
       await get().fetchImages({ id, token });
     }
+  },
+  resetCourtDetail: () => {
+    set({
+      courtDetail: null,
+    });
   },
 }));
