@@ -11,6 +11,7 @@ import {
 } from "tamagui";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { Link, useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../../../stores/courtStore";
@@ -33,10 +34,10 @@ export default function Court() {
   const addFavorite = useFavoriteStore((state) => state.addFavorite);
   const deleteFavorite = useFavoriteStore((state) => state.deleteFavorite);
   const addCheckin = useCourtDetailStore((state) => state.addCheckin);
-  const updatingCheckin = useCourtDetailStore((state) => state.updating);
-  const fetchCourtDetails = useCourtDetailStore(
-    (state) => state.fetchCourtDetails
-  );
+  const uploadImage = useCourtDetailStore((state) => state.uploadImage);
+  const updatingCheckin = useCourtDetailStore((state) => state.updatingCheckin);
+  const fetchCheckins = useCourtDetailStore((state) => state.fetchCheckins);
+  const fetchImages = useCourtDetailStore((state) => state.fetchImages);
   const loadingImages = useCourtDetailStore((state) => state.loadingImages);
   const loadingCheckins = useCourtDetailStore((state) => state.loadingCheckins);
   const courtDetail = useCourtDetailStore((state) => state.courtDetail);
@@ -47,7 +48,11 @@ export default function Court() {
       const token = await getToken({ template: "supabase" });
       if (!token) return;
 
-      fetchCourtDetails({
+      fetchCheckins({
+        id: Number(id),
+        token,
+      });
+      fetchImages({
         id: Number(id),
         token,
       });
@@ -104,16 +109,23 @@ export default function Court() {
   }
 
   const pickImage = async () => {
-    // setIsUploadingImage(true);
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       base64: true,
       quality: 1,
     });
 
     if (!result.canceled) {
+      const img = result.assets[0];
+      const base64 = await FileSystem.readAsStringAsync(img.uri, {
+        encoding: "base64",
+      });
+      const filePath = `${courtData?.id}/${new Date().getTime()}.png`;
+      console.log(filePath);
+      const token = await getToken({ template: "supabase" });
+      if (!token || typeof courtData?.id !== "number") return;
+      await uploadImage({ id: courtData?.id, base64, filePath, token });
     }
-    // setIsUploadingImage(false);
   };
 
   let imageMain: React.ReactNode = null;

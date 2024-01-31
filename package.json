@@ -17,6 +17,7 @@
     "@tamagui/config": "^1.79.6",
     "@tamagui/lucide-icons": "1.79.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
+    "base64-arraybuffer": "^1.0.2",
     "dayjs": "^1.11.10",
     "expo": "~50.0.3",
     "expo-auth-session": "~5.4.0",
