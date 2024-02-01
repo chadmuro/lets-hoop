@@ -12,6 +12,7 @@ export default function AuthLayout() {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: theme.orange10.get(),
+          lazy: false,
         }}
       >
         <Tabs.Screen
