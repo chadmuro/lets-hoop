@@ -17,8 +17,8 @@ module.exports = {
     ],
     ios: {
       bundleIdentifier: "com.chadmuro.letshoop",
-      buildNumber: "4",
-      supportsTablet: true,
+      buildNumber: "5",
+      supportsTablet: false,
     },
     android: {
       adaptiveIcon: {
