@@ -22,6 +22,7 @@ import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useCourtDetailStore } from "../../stores/courtDetailStore";
 import { useEffect } from "react";
 import { router } from "expo-router";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import CheckinList from "./CheckinList";
 
 export default function CourtPage() {
@@ -126,13 +127,33 @@ export default function CourtPage() {
       if (img.fileSize! > 10485760) {
         return Alert.alert("Image size is too large");
       }
-      const base64 = await FileSystem.readAsStringAsync(img.uri, {
-        encoding: "base64",
-      });
+
+      const resizedImage = await manipulateAsync(
+        img.uri,
+        [
+          {
+            resize: {
+              height: 800,
+            },
+          },
+        ],
+        {
+          base64: true,
+          format: SaveFormat.PNG,
+        }
+      );
+
       const filePath = `${courtData?.id}/${new Date().getTime()}.png`;
       const token = await getToken({ template: "supabase" });
       if (!token || typeof courtData?.id !== "number") return;
-      await uploadImage({ id: courtData?.id, base64, filePath, token });
+      if (resizedImage.base64) {
+        await uploadImage({
+          id: courtData?.id,
+          base64: resizedImage.base64,
+          filePath,
+          token,
+        });
+      }
     }
   };
 
