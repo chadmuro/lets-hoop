@@ -38,10 +38,14 @@ const LocationProvider = ({ children }: PropsWithChildren<{}>) => {
           return;
         }
 
-        let currentLocation = await Location.getCurrentPositionAsync({});
+        let currentLocation = await Location.getLastKnownPositionAsync({});
         setLocation({
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
+          latitude: currentLocation
+            ? currentLocation.coords.latitude
+            : DEFAULT_LOCATION.latitude,
+          longitude: currentLocation
+            ? currentLocation.coords.longitude
+            : DEFAULT_LOCATION.longitude,
           latitudeDelta: DEFAULT_LOCATION.latitudeDelta,
           longitudeDelta: DEFAULT_LOCATION.longitudeDelta,
         });
