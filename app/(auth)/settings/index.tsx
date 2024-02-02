@@ -4,6 +4,7 @@ import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { MyStack } from "../../../components/styled/MyStack";
 import { Link } from "expo-router";
+import * as MailComposer from "expo-mail-composer";
 import {
   Mail,
   ChevronRight,
@@ -32,6 +33,25 @@ export default function Settings() {
       { text: "Cancel", style: "cancel" },
       { text: "Sign out", style: "destructive", onPress: () => signOut() },
     ]);
+  }
+
+  async function onContactPress() {
+    const isAvailable = await MailComposer.isAvailableAsync();
+    if (isAvailable) {
+      const mailResult = await MailComposer.composeAsync({
+        recipients: ["chadmurodev@gmail.com"],
+        subject: `Let's Hoop: General contact`,
+      });
+
+      if (mailResult.status === MailComposer.MailComposerStatus.SENT) {
+        Alert.alert(
+          "Thank you for your email!",
+          "🤙 We will get back to you as soon as possilble"
+        );
+      }
+    } else {
+      Linking.openURL("mailto:chadmurodev@gmail.com");
+    }
   }
 
   return (
@@ -66,10 +86,10 @@ export default function Settings() {
           <ListItem
             hoverTheme
             pressTheme
-            title="Open default mail app"
+            title="Send an email"
             icon={Mail}
             iconAfter={ChevronRight}
-            onPress={() => Linking.openURL("mailto:chadmurodev@gmail.com")}
+            onPress={onContactPress}
           />
         </YGroup.Item>
         <YGroup.Item>

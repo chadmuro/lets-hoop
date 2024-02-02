@@ -11,11 +11,10 @@ import {
 } from "tamagui";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
 import { MyStack } from "../styled/MyStack";
 import { useGlobalSearchParams } from "expo-router";
 import { useCourtStore } from "../../stores/courtStore";
-import { Alert, Dimensions, TouchableOpacity } from "react-native";
+import { Alert, Dimensions, Linking, TouchableOpacity } from "react-native";
 import { Star, X } from "@tamagui/lucide-icons";
 import { useFavoriteStore } from "../../stores/favoriteStore";
 import { useAuth, useUser } from "@clerk/clerk-expo";
@@ -23,6 +22,7 @@ import { useCourtDetailStore } from "../../stores/courtDetailStore";
 import { useEffect } from "react";
 import { router } from "expo-router";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import * as MailComposer from "expo-mail-composer";
 import CheckinList from "./CheckinList";
 
 export default function CourtPage() {
@@ -157,6 +157,42 @@ export default function CourtPage() {
     }
   };
 
+  function onReportIssuePress() {
+    Alert.alert(
+      "Found an issue with the court details?",
+      "Send us an email with the details and we will get back to you as soon as possible",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Send email",
+          onPress: handleSendReportIssue,
+        },
+      ]
+    );
+  }
+
+  async function handleSendReportIssue() {
+    const isAvailable = await MailComposer.isAvailableAsync();
+    if (isAvailable) {
+      const mailResult = await MailComposer.composeAsync({
+        recipients: ["chadmurodev@gmail.com"],
+        subject: `Let's Hoop: Reporting issue with ${courtData?.name} (Id: ${courtData?.id})`,
+      });
+
+      if (mailResult.status === MailComposer.MailComposerStatus.SENT) {
+        Alert.alert(
+          "Thank you for reporting an issue!",
+          "🤙 We will review the details and get back to you as soon as possilble"
+        );
+      }
+    } else {
+      Linking.openURL("mailto:chadmurodev@gmail.com");
+    }
+  }
+
   let imageMain: React.ReactNode = null;
   if (loadingImages) {
     imageMain = (
@@ -271,7 +307,9 @@ export default function CourtPage() {
             Check-in
           </Button>
           <CheckinList loading={loadingCheckins} courtDetail={courtDetail} />
-          <Button onPress={() => router.back()}>Back</Button>
+          <Button theme="red" onPress={onReportIssuePress}>
+            Report an issue
+          </Button>
         </YStack>
       </ScrollView>
     </MyStack>

@@ -77,7 +77,7 @@ export const useCourtDetailStore = create<CourtDetailState>((set, get) => ({
     const imageListRes = await supabase?.storage
       .from("courts")
       .list(String(id), {
-        limit: 3,
+        limit: 5,
         offset: 0,
         sortBy: { column: "created_at", order: "desc" },
       });
