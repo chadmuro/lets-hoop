@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { Alert } from "react-native";
 
 export default function Username() {
   const { user } = useUser();
@@ -10,13 +11,19 @@ export default function Username() {
   const [username, setUsername] = useState(user?.username || "");
 
   const onSavePress = async () => {
+    if (username.length < 4 || username.length > 64) {
+      return Alert.alert("Username must be between 4 and 64 characters long.");
+    }
     if (user) {
-      const newUser = await user.update({
-        username,
-      });
-      console.log(newUser);
-      if (newUser) {
-        router.back();
+      try {
+        const newUser = await user.update({
+          username,
+        });
+        if (newUser) {
+          router.back();
+        }
+      } catch (err: any) {
+        Alert.alert(err.errors[0].message);
       }
     }
   };

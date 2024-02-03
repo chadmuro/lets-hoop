@@ -26,7 +26,6 @@ export default function SignInScreen() {
       await setActive({ session: completeSignIn.createdSessionId });
     } catch (err: any) {
       Alert.alert(err.errors[0].message);
-      console.log(err.errors[0].message);
     }
   };
   return (

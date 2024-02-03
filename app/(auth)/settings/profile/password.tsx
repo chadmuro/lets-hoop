@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MyStack } from "../../../../components/styled/MyStack";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { Alert } from "react-native";
 
 export default function Password() {
   const { user } = useUser();
@@ -11,15 +12,24 @@ export default function Password() {
   const [newPassword, setNewPassword] = useState("");
 
   const onSavePress = async () => {
+    if (!currentPassword) {
+      return Alert.alert("Enter current password");
+    }
+    if (newPassword.length < 8) {
+      return Alert.alert("Passwords must be 8 characters or more.");
+    }
     if (user) {
-      const newUser = await user.updatePassword({
-        newPassword,
-        currentPassword,
-        signOutOfOtherSessions: true,
-      });
-      console.log(newUser);
-      if (newUser) {
-        router.back();
+      try {
+        const newUser = await user.updatePassword({
+          newPassword,
+          currentPassword,
+          signOutOfOtherSessions: true,
+        });
+        if (newUser) {
+          router.back();
+        }
+      } catch (err: any) {
+        Alert.alert(err.errors[0].message);
       }
     }
   };

@@ -3,6 +3,7 @@ import { Text, Input, Button, View } from "tamagui";
 import { useSignUp } from "@clerk/clerk-expo";
 import SignInWithOAuth from "../../components/SignInWIthOAuth";
 import { MyStack } from "../../components/styled/MyStack";
+import { Alert } from "react-native";
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -19,6 +20,10 @@ export default function SignUpScreen() {
       return;
     }
 
+    if (password.length < 8) {
+      return Alert.alert("Passwords must be 8 characters or more.");
+    }
+
     try {
       await signUp.create({
         username,
@@ -32,7 +37,7 @@ export default function SignUpScreen() {
       // change the UI to our pending section.
       setPendingVerification(true);
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      Alert.alert(err.errors[0].message);
     }
   };
 
@@ -49,7 +54,7 @@ export default function SignUpScreen() {
 
       await setActive({ session: completeSignUp.createdSessionId });
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      Alert.alert(err.errors[0].message);
     }
   };
 
